@@ -1,0 +1,255 @@
+// preloader fadeout
+jQuery(window).load(function() {
+	jQuery('.se-pre-con').delay(500).fadeOut('slow');
+	jQuery('body').css({'overflow':'auto', 'height':'auto', 'position':'relative'}); // restore scrollbar after preloading
+})
+
+jQuery(document).ready(function($){
+
+    // reload page if external anchor link - fix for firefox
+    if (window.location.hash) {
+        setTimeout(function () {
+            var hash = window.location.hash;
+            window.location.hash = "";
+            window.location.hash = hash;
+        }, 300);
+    }
+
+	$('#search-top-bar-submit').on('click', function (e) {
+		e.preventDefault();
+		var element = $('#search-field-top-bar');
+		element.toggleClass('opened');
+		element.parent().siblings('button').toggleClass('input-open');
+	});
+
+
+	// Things we want to trigger once, manually, after loading the page
+	// ------------------------------------------------------------------------
+
+
+    // testimonials carousel
+        var slider = $("#light-slider").lightSlider({
+		item:2,
+		pager: false,
+	    controls: false,
+        slideMargin: 30,
+        responsive : [
+				{
+					breakpoint:979,
+					settings: {
+						item:2,
+						slideMove:1,
+						slideMargin:6,
+					  }
+				},
+				{
+					breakpoint:480,
+					settings: {
+						item:1,
+						slideMove:1
+					  }
+				}
+			],
+		onSliderLoad: function() {
+			$('#goToPrevSlide').on('click', function () {
+				slider.goToPrevSlide();
+			});
+			$('#goToNextSlide').on('click', function () {
+				slider.goToNextSlide();
+			});
+		}
+
+		});
+
+
+
+
+		if ( $('.bootstart-slider').length ) {
+			owl = $('.bootstart-slider');
+
+			owl.on('initialized.owl.carousel', function () {
+				$('.owl-nav-list').addClass('active');
+			});
+
+			owl.owlCarousel({
+				loop           : true,
+				items          : 1,
+				dots           : false,
+				mouseDrag      : true,
+				navText        : '',
+				// navText     : [ "<i class='fa fa-angle-left'></i>", "<i class='fa fa-angle-right'></i>" ],
+				navClass       : [ "main-slider-previous", "main-slider-next" ],
+				autoplay       : true,
+				autoplayTimeout: 17000,
+				responsive     : {
+					1   : {
+						nav : false,
+						dots: false
+					},
+					600 : {
+						nav : false,
+						dots: true
+					},
+					991 : {
+						nav : false,
+						dots: true
+
+					},
+					1300: {
+						nav : true,
+						dots: true
+					}
+				}
+			}).on('translated.owl.carousel', function (event) {
+
+				$('.owl-nav-list li.active').removeClass('active');
+				$('.owl-nav-list li:eq(' + event.page.index + ')').addClass('active');
+
+			}).on('changed.owl.carousel', function (event) {
+
+				// future enhancement
+
+			});
+
+			$('.owl-nav-list li').click(function () {
+				var slide_index = $(this).index();
+
+				owl.trigger("to.owl.carousel", [ slide_index, 300 ]);
+				return false;
+			})
+
+		};
+
+
+		//Smooth scroll to anchors
+		//added :not([data-toggle]) below to avoid conflict with bootstrap tabbed panels, carousel, etc.
+		//$('a[href*=#]:not([href=#])').click(function() {
+		$('a[href*="#"]:not([href="#"]):not([data-toggle])').click(function() {
+			if (location.pathname.replace(/^\//,'') == this.pathname.replace(/^\//,'')
+				|| location.hostname == this.hostname) {
+
+				var target = $(this.hash);
+				target = target.length ? target : $('[name=' + this.hash.slice(1) +']');
+				   if (target.length) {
+					 $('html,body').animate({
+						 //scrollTop: target.offset().top - 4
+						 //scrollTop: target.offset().top - 90
+						 scrollTop: target.offset().top - 20
+					}, 1000);
+					return false;
+				}
+			}
+		});
+
+
+		// Back to top
+
+		var offset = 300,
+				offset_opacity = 1200,
+				scroll_top_duration = 700,
+				$back_to_top = $('#back-to-top');
+		jQuery(window).scroll(function () {
+			( jQuery(this).scrollTop() > offset ) ? $back_to_top.addClass('back-to-top-is-visible') : $back_to_top.removeClass('back-to-top-is-visible back-to-top-fade-out');
+			if ( jQuery(this).scrollTop() > offset_opacity ) {
+				$back_to_top.addClass('back-to-top-fade-out');
+			}
+		});
+		$back_to_top.on('click', function (event) {
+			event.preventDefault();
+			jQuery('body,html').animate({
+						scrollTop: 0
+					}, scroll_top_duration
+			);
+		});
+
+
+		// modal search field focus
+
+		$('#SearchModal').on('shown.bs.modal', function () {
+			$('#SearchField').focus();
+		})
+
+
+		// dropdown menu animation
+
+		// Add slideup & fadein animation to dropdown
+
+		if($(window).width() >= 1199) {
+
+		$('.dropdown').on('show.bs.dropdown', function(e){
+			var $dropdown = $(this).find('.dropdown-menu');
+			var orig_margin_top = parseInt($dropdown.css('margin-top'));
+			$dropdown.css({'margin-top': (orig_margin_top + 10) + 'px', opacity: 0}).animate({'margin-top': orig_margin_top + 'px', opacity: 1}, 300, function(){
+				$(this).css({'margin-top':''});
+			});
+		});
+		// Add slidedown & fadeout animation to dropdown
+		$('.dropdown').on('hide.bs.dropdown', function(e){
+			var $dropdown = $(this).find('.dropdown-menu');
+			var orig_margin_top = parseInt($dropdown.css('margin-top'));
+			$dropdown.css({'margin-top': orig_margin_top + 'px', opacity: 1, display: 'block'}).animate({'margin-top': (orig_margin_top + 10) + 'px', opacity: 0}, 300, function(){
+				$(this).css({'margin-top':'', display:''});
+			});
+		});
+
+		}
+
+		// experiences light slider
+		jQuery("#experience-slider").lightSlider({
+			item: 4,
+			autoWidth: false,
+			slideMove: 1, // slidemove will be 1 if loop is true
+			slideMargin: 0,
+
+			addClass: 'experience-slider',
+			mode: "slide",
+			useCSS: true,
+			cssEasing: 'ease', //'cubic-bezier(0.25, 0, 0.25, 1)',//
+			easing: 'linear', //'for jquery animation',////
+
+			speed: 400, //ms'
+			auto: true,
+			loop: true,
+			slideEndAnimation: true,
+			pause: 4000,
+
+			keyPress: false,
+			controls: true,
+			prevHtml: '<i class="fa fa-chevron-left fa-lg"></i>',
+			nextHtml: '<i class="fa fa-chevron-right fa-lg"></i>',
+
+			pager: false,
+
+			enableTouch:true,
+			enableDrag:true,
+			freeMove:true,
+			swipeThreshold: 40,
+            onSliderLoad: function() {
+                $('#experience-slider').removeClass('cS-hidden');
+            },
+				responsive : [
+					{
+						breakpoint:1000,
+						settings: {
+							item:4,
+							slideMove:1,
+						  }
+					},
+					{
+						breakpoint:600,
+						settings: {
+							item:3,
+							slideMove:1
+						  }
+					},
+					{
+						breakpoint:0,
+						settings: {
+							item:1,
+							slideMove:1
+						  }
+					}
+				]
+		});
+
+});
